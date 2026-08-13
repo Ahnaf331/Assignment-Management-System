@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet --version)",
+      "Bash(npm --version)",
+      "Bash(psql --version)",
+      "Bash(dotnet ef *)",
+      "Bash(dotnet new *)",
+      "Bash(dotnet sln *)",
+      "Bash(dotnet add *)",
+      "Bash(rm -f AssignmentManagement.Domain/Class1.cs AssignmentManagement.Application/Class1.cs AssignmentManagement.Infrastructure/Class1.cs)",
+      "Bash(rm -f AssignmentManagement.API/Controllers/WeatherForecastController.cs AssignmentManagement.API/WeatherForecast.cs)",
+      "Bash(rm -f \"../../testing/AssignmentManagement.Tests/UnitTest1.cs\")",
+      "Bash(dotnet build *)",
+      "Bash(grep -oE '\"[a-z_]+\"$')",
+      "Bash(powershell -NoProfile -Command \"Get-Service -Name '*postgres*' -ErrorAction SilentlyContinue | Select-Object Name,Status; \\(Test-NetConnection -ComputerName localhost -Port 5432 -WarningAction SilentlyContinue\\).TcpTestSucceeded\")",
+      "Bash(ASPNETCORE_URLS=\"http://localhost:5080\" ASPNETCORE_ENVIRONMENT=Development dotnet run --no-launch-profile)",
+      "Bash(echo \"started, pid $!\")",
+      "Read(//tmp/**)",
+      "Bash(powershell -NoProfile -Command 'Get-CimInstance Win32_Process -Filter \"Name='\\\\''dotnet.exe'\\\\''\" | Where-Object { $_.CommandLine -like '\\\\''*AssignmentManagement.API*'\\\\'' -or $_.CommandLine -like '\\\\''*run --no-launch-profile*'\\\\'' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }')",
+      "Bash(rm -rf /tmp/hashgen)",
+      "Bash(dotnet test *)",
+      "Bash(grep -E \"^next$\")",
+      "Bash(npm run *)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(npm install *)",
+      "Bash(npx next *)",
+      "Bash(echo \"pid $!\")",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:3001/)",
+      "Bash(curl -s http://localhost:3001/)",
+      "Bash(powershell -NoProfile -Command 'Get-CimInstance Win32_Process -Filter \"Name='\\\\''node.exe'\\\\''\" | Where-Object { $_.CommandLine -like '\\\\''*next*'\\\\'' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }')",
+      "Bash(git --version)",
+      "Bash(gh --version)",
+      "Bash(gh auth *)",
+      "Bash(git config *)"
+    ]
+  }
+}
