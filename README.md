@@ -2,10 +2,8 @@
 
 A role-based school/college web application where **teachers** create assignments,
 **students** submit their work, and teachers **review, mark and give feedback** — with an
-**admin** managing users, classes, subjects and teacher allocations. The UI is designed to
-feel like **Google Classroom**.
+**admin** managing users, classes, subjects and teacher allocations. 
 
-> Built for the *Assistant Software Engineer Recruitment Project*.
 
 ---
 
@@ -24,9 +22,6 @@ feel like **Google Classroom**.
 - [Running the tests](#running-the-tests)
 - [Demo credentials](#demo-credentials)
 - [API overview](#api-overview)
-- [Business rules enforced](#business-rules-enforced)
-- [Assumptions](#assumptions)
-- [Known limitations](#known-limitations)
 
 ---
 
@@ -304,47 +299,3 @@ The `GET /assignments` list is role-aware: Admin sees everything, a Teacher sees
 assignments they authored, and a Student sees only **published** assignments for **their** class.
 
 ---
-
-## Business rules enforced
-
-- Authentication uses BCrypt-hashed passwords; deactivated accounts cannot log in.
-- A teacher can only create an assignment for a subject/class they are **assigned** to.
-- Students only see and can only submit to **published** assignments for **their own class**.
-- A student cannot submit after the deadline unless late submissions are allowed
-  (then it is flagged **Late**); one submission per student per assignment.
-- A submission can only be updated **before the deadline**, when the assignment allows it,
-  and not after it has been graded.
-- Marks must be between `0` and the assignment's maximum marks.
-- A teacher can only view/grade submissions for their **own** assignments.
-- An assignment with existing submissions cannot be reverted to draft.
-
-These are covered by the unit tests in `testing/AssignmentManagement.Tests`.
-
----
-
-## Assumptions
-
-- **One class per student.** Each student belongs to a single class/course
-  (`ClassCourseId`), which keeps enrolment and "assignments for my class" simple.
-- **Subjects belong to a class.** A subject is scoped to one class; its code is unique within
-  that class. Teacher allocation is per (teacher, subject, class).
-- **Submissions are text/links.** The answer is stored as text (which may include a link to
-  externally-hosted work) rather than binary file upload.
-- **Deleting users is a soft-delete** (deactivate) to preserve historical assignments and
-  submissions; deleting an assignment cascades to its submissions.
-- **Auto-migrate & seed on startup** for a smooth local setup. The committed connection string
-  and JWT secret are **local-development defaults** — override them via environment variables
-  (see `.env.example`) for any real deployment.
-- Times are handled in **UTC** on the backend.
-
----
-
-## Known limitations
-
-- No file/attachment upload (submissions are text; a link can be pasted instead).
-- No refresh-token rotation — a single JWT access token (8h default) is issued.
-- Pagination is available on the API shape (`PagedResult`) but list endpoints currently
-  return full lists filtered by search; large datasets would benefit from server-side paging.
-- No email notifications (e.g. new assignment / graded) — surfaced in-app only.
-- The auto-seed and `seed.sql` are alternatives; running both may duplicate the
-  assignment/submission rows that use non-fixed IDs in the auto-seeder.
