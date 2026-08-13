@@ -128,6 +128,8 @@ static async Task MigrateAndSeedAsync(WebApplication app)
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     var logger = services.GetRequiredService<ILoggerFactory>().CreateLogger("Startup");
+    var configuration = services.GetRequiredService<IConfiguration>();
+
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
@@ -138,9 +140,53 @@ static async Task MigrateAndSeedAsync(WebApplication app)
     }
     catch (Exception ex)
     {
+        // A first-run database connection failure is almost always missing local
+        // configuration rather than a bug, so print actionable setup guidance
+        // instead of leaving the developer with a bare stack trace.
+        PrintDatabaseSetupHelp(configuration, ex);
         logger.LogError(ex, "An error occurred while migrating or seeding the database.");
         throw;
     }
+}
+
+static void PrintDatabaseSetupHelp(IConfiguration configuration, Exception ex)
+{
+    var connectionString = configuration.GetConnectionString("DefaultConnection") ?? string.Empty;
+    var placeholderInUse = connectionString.Contains("YOUR_POSTGRES_PASSWORD", StringComparison.OrdinalIgnoreCase);
+    var isAuthFailure = ex.ToString().Contains("28P01") || ex.ToString().Contains("password authentication failed");
+
+    if (!placeholderInUse && !isAuthFailure) return;
+
+    var previous = Console.ForegroundColor;
+    Console.ForegroundColor = ConsoleColor.Yellow;
+
+    Console.Error.WriteLine();
+    Console.Error.WriteLine("========================================================================");
+    Console.Error.WriteLine(" DATABASE SETUP REQUIRED");
+    Console.Error.WriteLine("========================================================================");
+    Console.Error.WriteLine();
+    Console.Error.WriteLine(placeholderInUse
+        ? " The connection string still contains the placeholder 'YOUR_POSTGRES_PASSWORD'."
+        : " Could not authenticate against PostgreSQL with the configured password.");
+    Console.Error.WriteLine();
+    Console.Error.WriteLine(" Set your local PostgreSQL password using EITHER option:");
+    Console.Error.WriteLine();
+    Console.Error.WriteLine(" 1) Local settings file (recommended)");
+    Console.Error.WriteLine("      cd backend/src/AssignmentManagement.API");
+    Console.Error.WriteLine("      copy appsettings.Development.json.example appsettings.Development.json");
+    Console.Error.WriteLine("    then edit it and replace YOUR_POSTGRES_PASSWORD with your password.");
+    Console.Error.WriteLine("    (This file is gitignored, so your password is never committed.)");
+    Console.Error.WriteLine();
+    Console.Error.WriteLine(" 2) Environment variable");
+    Console.Error.WriteLine("      $env:ConnectionStrings__DefaultConnection=\"Host=localhost;Port=5432;\" +");
+    Console.Error.WriteLine("        \"Database=assignment_management;Username=postgres;Password=YOUR_PASSWORD\"");
+    Console.Error.WriteLine();
+    Console.Error.WriteLine(" Also make sure the PostgreSQL service is running on localhost:5432.");
+    Console.Error.WriteLine(" Full details: see 'Configure your database password' in README.md");
+    Console.Error.WriteLine("========================================================================");
+    Console.Error.WriteLine();
+
+    Console.ForegroundColor = previous;
 }
 
 // Exposed so the test project can reference the entry point if needed.

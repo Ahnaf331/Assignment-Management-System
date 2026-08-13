@@ -168,14 +168,25 @@ Host=localhost  Port=5432  Database=assignment_management  Username=postgres  Pa
 
 ## Quick start
 
+> **Step 1 is required.** No real credentials are committed to this repo, so you must
+> supply your own PostgreSQL password once. Everything else is automatic — the backend
+> creates the database, applies migrations and seeds demo data on first run.
+
 ```bash
-# 1. Backend (creates the DB, applies migrations and seeds demo data automatically)
-cd "backend/src/AssignmentManagement.API"
+# 1. Set your PostgreSQL password (ONE TIME - required)
+cd backend/src/AssignmentManagement.API
+copy appsettings.Development.json.example appsettings.Development.json   # Windows
+# cp appsettings.Development.json.example appsettings.Development.json   # macOS/Linux
+#   -> open appsettings.Development.json and replace YOUR_POSTGRES_PASSWORD
+#      with the password for your local 'postgres' user.
+#      This file is gitignored, so your password is never committed.
+
+# 2. Backend (creates the DB, applies migrations and seeds demo data automatically)
 dotnet run
 #   API:     http://localhost:5080
 #   Swagger: http://localhost:5080/swagger
 
-# 2. Frontend (in a second terminal)
+# 3. Frontend (in a second terminal)
 cd frontend
 npm install          # first time only
 npm run dev
@@ -183,6 +194,9 @@ npm run dev
 ```
 
 Open http://localhost:3000, then sign in with any demo account below.
+
+If you skip step 1, the API stops on startup and prints exactly which file to edit —
+so it fails loudly with instructions rather than silently.
 
 ---
 
