@@ -267,7 +267,8 @@ dotnet test ../testing/AssignmentManagement.Tests/AssignmentManagement.Tests.csp
 ```
 
 29 unit tests cover authentication, assignment authorization and the full submission
-workflow (see [Business rules enforced](#business-rules-enforced)).
+workflow — including deadline rules, late/resubmission handling, mark validation and
+role-based access checks.
 
 ---
 
